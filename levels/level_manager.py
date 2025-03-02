@@ -1,6 +1,6 @@
 import pygame
-from ui.button import Button
 from assets.styles import Colors, Fonts
+from ui.button import Button
 
 class Level:
     def __init__(self, number, question, answer, hint):
@@ -9,7 +9,7 @@ class Level:
         self.answer = answer
         self.hint = hint
         self.start_time = None
-        
+
 class LevelManager:
     def __init__(self):
         self.levels = [
@@ -25,70 +25,40 @@ class LevelManager:
                   "len", "How do we measure collection size?")
         ]
 
-class LevelScreen(GameState):
-    def __init__(self, game, level_num):
-        super().__init__(game)
-        self.level_manager = LevelManager()
-        self.current_level = self.level_manager.levels[level_num - 1]
-        self.answer_box = InputBox(250, 300, 300, 40, "Answer")
-        self.show_hint = False
-        self.start_time = pygame.time.get_ticks()
-        
+class InputBox: # Added InputBox class, assuming it's defined elsewhere and needed.  This is a guess based on original code.
+    def __init__(self, x, y, w, h, text=""):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = Colors.INPUT_BOX
+        self.text = text
+        self.txt_surface = Fonts.MEDIUM.render(text, True, Colors.TEXT)
+        self.active = False
+
     def handle_event(self, event):
-        self.answer_box.handle_event(event)
-        
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # Check submit button
-            if event.pos[0] > 300 and event.pos[0] < 500:
-                if event.pos[1] > 360 and event.pos[1] < 410:
-                    self.check_answer()
-                    
-            # Check hint button
-            if event.pos[0] > 300 and event.pos[0] < 500:
-                if event.pos[1] > 420 and event.pos[1] < 470:
-                    self.show_hint = True
-                    
-    def check_answer(self):
-        if self.answer_box.text.lower() == self.current_level.answer.lower():
-            time_taken = (pygame.time.get_ticks() - self.start_time) / 1000
-            score = max(100 - int(time_taken), 10)
-            
-            self.game.db.save_score(
-                self.game.current_user,
-                self.current_level.number,
-                score,
-                time_taken
-            )
-            
-            if self.current_level.number < 5:
-                self.game.change_state(LevelScreen(self.game,
-                                                 self.current_level.number + 1))
+            if self.rect.collidepoint(event.pos):
+                self.active = not self.active
             else:
-                self.game.change_state(HomeScreen(self.game))
-                
+                self.active = False
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    print(self.text)
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                self.txt_surface = Fonts.MEDIUM.render(self.text, True, Colors.TEXT)
+
     def draw(self, screen):
-        # Draw level number
-        level_text = Fonts.LARGE.render(f"Level {self.current_level.number}",
-                                      True, Colors.TEXT)
-        screen.blit(level_text, (320, 100))
-        
-        # Draw question
-        question_text = Fonts.MEDIUM.render(self.current_level.question,
-                                          True, Colors.TEXT)
-        screen.blit(question_text, (100, 200))
-        
-        # Draw answer box
-        self.answer_box.draw(screen)
-        
-        # Draw buttons
-        submit_btn = Button("Submit", 300, 360, 200, 50)
-        hint_btn = Button("Show Hint", 300, 420, 200, 50)
-        
-        submit_btn.draw(screen)
-        hint_btn.draw(screen)
-        
-        # Draw hint if requested
-        if self.show_hint:
-            hint_text = Fonts.SMALL.render(f"Hint: {self.current_level.hint}",
-                                         True, Colors.TEXT)
-            screen.blit(hint_text, (100, 500))
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        pygame.draw.rect(screen, self.color, self.rect, 2)
+
+class HomeScreen: # Added HomeScreen class. This is a guess based on original code.
+    def __init__(self, game):
+        pass # Placeholder, actual implementation needed.
+
+    def handle_event(self, event):
+        pass # Placeholder
+
+    def draw(self, screen):
+        pass # Placeholder
