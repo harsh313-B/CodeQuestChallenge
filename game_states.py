@@ -114,12 +114,12 @@ class LevelScreen(GameState):
         self.level_manager = LevelManager()
         self.current_level = self.level_manager.levels[level_num - 1]
         self.answer_box = InputBox(250, 350, 300, 40, "Your Answer")
-        self.show_hint = False
+        self.show_answer = False
         self.start_time = pygame.time.get_ticks()
 
         # Initialize buttons
         self.submit_button = Button("Submit Answer", 300, 410, 200, 50)
-        self.hint_button = Button("Show Hint", 300, 470, 200, 50)
+        self.show_answer_button = Button("Show Answer", 300, 470, 200, 50)
         self.back_button = Button("Back to Menu", 300, 530, 200, 50)
 
     def handle_event(self, event):
@@ -129,9 +129,9 @@ class LevelScreen(GameState):
             if self.submit_button.is_clicked(event.pos):
                 self.game.sounds['click'].play()
                 self.check_answer()
-            elif self.hint_button.is_clicked(event.pos):
+            elif self.show_answer_button.is_clicked(event.pos):
                 self.game.sounds['click'].play()
-                self.show_hint = True
+                self.show_answer = True
             elif self.back_button.is_clicked(event.pos):
                 self.game.sounds['click'].play()
                 self.game.change_state(HomeScreen(self.game))
@@ -178,11 +178,14 @@ class LevelScreen(GameState):
         # Draw answer box and buttons
         self.answer_box.draw(screen)
         self.submit_button.draw(screen)
-        self.hint_button.draw(screen)
+        self.show_answer_button.draw(screen)
         self.back_button.draw(screen)
 
-        # Draw hint if requested
-        if self.show_hint:
-            hint_text = Fonts.SMALL.render(f"Hint: {self.current_level.hint}",
-                                        True, Colors.TEXT)
-            screen.blit(hint_text, (50, 580))
+        # Draw correct answer if requested
+        if self.show_answer:
+            answer_lines = self.current_level.correct_answer.split('\n')
+            y_offset = 580
+            for line in answer_lines:
+                answer_text = Fonts.SMALL.render(line, True, Colors.TEXT)
+                screen.blit(answer_text, (50, y_offset))
+                y_offset += 20

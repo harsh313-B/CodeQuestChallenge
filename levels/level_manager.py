@@ -3,12 +3,12 @@ from assets.styles import Colors, Fonts
 from ui.button import Button
 
 class Level:
-    def __init__(self, number, description, puzzle_data, answer, hint):
+    def __init__(self, number, description, puzzle_data, answer, correct_answer):
         self.number = number
         self.description = description
         self.puzzle_data = puzzle_data
         self.answer = answer
-        self.hint = hint
+        self.correct_answer = correct_answer
         self.start_time = None
 
 class LevelManager:
@@ -19,34 +19,34 @@ class LevelManager:
                 {"code": "def greet(name)\nprint('Hello, ' + name)",
                  "expected_output": "Hello, Alice"},
                 ":", 
-                "Look carefully at the function definition line!"),
+                "Correct answer: Add ':' after function definition\ndef greet(name):\nprint('Hello, ' + name)"),
 
             Level(2,
                 "Complete the Pattern!\nWhat symbol completes this pattern?\n\n# * * *\n# * _ *\n# * * *",
                 {"pattern": ["* * *", "* _ *", "* * *"]},
                 "*",
-                "The pattern is symmetrical!"),
+                "Correct answer: '*' completes the symmetrical pattern\n* * *\n* * *\n* * *"),
 
             Level(3,
                 "Decode the Message!\nEach number represents a letter position (A=1, B=2, etc):\n\n16 25 20 8 15 14",
                 {"encoded": "16 25 20 8 15 14",
                  "cipher": "position"},
                 "python",
-                "These numbers spell out a programming language!"),
+                "Correct answer: PYTHON\n16=P, 25=Y, 20=T, 8=H, 15=O, 14=N"),
 
             Level(4,
                 "Fix the Logic!\nWhat operator fixes this code?\n\nif age [] 18:\n    print('Adult')\nelse:\n    print('Minor')",
                 {"code": "if age [] 18:",
                  "options": [">=", "<=", "==", "!="]},
                 ">=",
-                "Think about checking if someone is an adult!"),
+                "Correct answer: '>='\nif age >= 18:\n    print('Adult')\nelse:\n    print('Minor')"),
 
             Level(5,
                 "Complete the Sequence!\nWhat's the missing operator?\n\nresult = 10 [] 2 [] 3\nprint(result)  # Output: 5",
                 {"sequence": "10 [] 2 [] 3",
                  "target": 5},
                 "/ +",
-                "Division then addition...")
+                "Correct answer: '/ +'\nresult = 10 / 2 + 3\nprint(result)  # Output: 5")
         ]
 
 class InputBox:
