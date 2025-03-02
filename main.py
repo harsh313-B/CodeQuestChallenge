@@ -1,6 +1,3 @@
-import os
-os.environ['SDL_VIDEODRIVER'] = 'dummy'  # Force software rendering
-
 import pygame
 import sys
 from database import Database
@@ -10,12 +7,22 @@ from assets.sounds import load_sounds
 
 class CodeQuest:
     def __init__(self):
+        # Initialize Pygame
         pygame.init()
-        pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode((800, 600))
+        # Set up display with error handling
+        try:
+            # Try hardware-accelerated mode first
+            self.screen = pygame.display.set_mode((800, 600))
+        except pygame.error:
+            # Fallback to software rendering if hardware acceleration fails
+            pygame.display.quit()
+            pygame.init()
+            self.screen = pygame.display.set_mode((800, 600), pygame.SWSURFACE)
+
         pygame.display.set_caption("Code Quest")
 
+        # Initialize other components
         self.clock = pygame.time.Clock()
         self.db = Database()
         self.sounds = load_sounds()
@@ -41,7 +48,11 @@ class CodeQuest:
             self.state.update()
             self.state.draw(self.screen)
 
-            pygame.display.flip()
+            try:
+                pygame.display.flip()
+            except pygame.error:
+                print("Error updating display")
+                continue
 
 if __name__ == "__main__":
     game = CodeQuest()
