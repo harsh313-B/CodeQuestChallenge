@@ -61,16 +61,20 @@ class AuthScreen(GameState):
         self.username_box = InputBox(250, 200, 300, 40, "Username")
         self.password_box = InputBox(250, 260, 300, 40, "Password")
         self.message = ""
+        self.submit_button = Button("Submit", 300, 320, 200, 50)
+        self.back_button = Button("Back", 300, 380, 200, 50)
 
     def handle_event(self, event):
         self.username_box.handle_event(event)
         self.password_box.handle_event(event)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.pos[0] > 300 and event.pos[0] < 500:
-                if event.pos[1] > 320 and event.pos[1] < 370:
-                    self.game.sounds['click'].play()
-                    self.process_auth()
+            if self.submit_button.is_clicked(event.pos):
+                self.game.sounds['click'].play()
+                self.process_auth()
+            elif self.back_button.is_clicked(event.pos):
+                self.game.sounds['click'].play()
+                self.game.change_state(HomeScreen(self.game))
 
     def process_auth(self):
         username = self.username_box.text
@@ -97,10 +101,12 @@ class AuthScreen(GameState):
 
         self.username_box.draw(screen)
         self.password_box.draw(screen)
+        self.submit_button.draw(screen)
+        self.back_button.draw(screen)
 
         if self.message:
             msg_text = Fonts.SMALL.render(self.message, True, Colors.ERROR)
-            screen.blit(msg_text, (250, 400))
+            screen.blit(msg_text, (250, 450))
 
 class LevelScreen(GameState):
     def __init__(self, game, level_num):
@@ -111,19 +117,24 @@ class LevelScreen(GameState):
         self.show_hint = False
         self.start_time = pygame.time.get_ticks()
 
+        # Initialize buttons
+        self.submit_button = Button("Submit Answer", 300, 360, 200, 50)
+        self.hint_button = Button("Show Hint", 300, 420, 200, 50)
+        self.back_button = Button("Back to Menu", 300, 480, 200, 50)
+
     def handle_event(self, event):
         self.answer_box.handle_event(event)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # Check submit button
-            if event.pos[0] > 300 and event.pos[0] < 500:
-                if event.pos[1] > 360 and event.pos[1] < 410:
-                    self.check_answer()
-
-            # Check hint button
-            if event.pos[0] > 300 and event.pos[0] < 500:
-                if event.pos[1] > 420 and event.pos[1] < 470:
-                    self.show_hint = True
+            if self.submit_button.is_clicked(event.pos):
+                self.game.sounds['click'].play()
+                self.check_answer()
+            elif self.hint_button.is_clicked(event.pos):
+                self.game.sounds['click'].play()
+                self.show_hint = True
+            elif self.back_button.is_clicked(event.pos):
+                self.game.sounds['click'].play()
+                self.game.change_state(HomeScreen(self.game))
 
     def check_answer(self):
         if self.answer_box.text.lower() == self.current_level.answer.lower():
@@ -158,11 +169,9 @@ class LevelScreen(GameState):
         self.answer_box.draw(screen)
 
         # Draw buttons
-        submit_btn = Button("Submit", 300, 360, 200, 50)
-        hint_btn = Button("Show Hint", 300, 420, 200, 50)
-
-        submit_btn.draw(screen)
-        hint_btn.draw(screen)
+        self.submit_button.draw(screen)
+        self.hint_button.draw(screen)
+        self.back_button.draw(screen)
 
         # Draw hint if requested
         if self.show_hint:
