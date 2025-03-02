@@ -3,9 +3,10 @@ from assets.styles import Colors, Fonts
 from ui.button import Button
 
 class Level:
-    def __init__(self, number, question, answer, hint):
+    def __init__(self, number, description, puzzle_data, answer, hint):
         self.number = number
-        self.question = question
+        self.description = description
+        self.puzzle_data = puzzle_data
         self.answer = answer
         self.hint = hint
         self.start_time = None
@@ -13,19 +14,42 @@ class Level:
 class LevelManager:
     def __init__(self):
         self.levels = [
-            Level(1, "What is the output of: print(2 + '2')?",
-                  "TypeError", "Think about data types!"),
-            Level(2, "Complete the sequence: for i in _____(5):",
-                  "range", "How do we count from 0 to 4?"),
-            Level(3, "What method converts 'hello' to 'HELLO'?",
-                  "upper", "Look for case transformation"),
-            Level(4, "What symbol creates a comment in Python?",
-                  "#", "It's not a programming operator"),
-            Level(5, "What function returns list length?",
-                  "len", "How do we measure collection size?")
+            Level(1, 
+                "Debug the Code!\nFind and fix the error in this Python code:\n\ndef greet(name)\nprint('Hello, ' + name)",
+                {"code": "def greet(name)\nprint('Hello, ' + name)",
+                 "expected_output": "Hello, Alice"},
+                ":", 
+                "Look carefully at the function definition line!"),
+
+            Level(2,
+                "Complete the Pattern!\nWhat symbol completes this pattern?\n\n# * * *\n# * _ *\n# * * *",
+                {"pattern": ["* * *", "* _ *", "* * *"]},
+                "*",
+                "The pattern is symmetrical!"),
+
+            Level(3,
+                "Decode the Message!\nEach number represents a letter position (A=1, B=2, etc):\n\n16 25 20 8 15 14",
+                {"encoded": "16 25 20 8 15 14",
+                 "cipher": "position"},
+                "python",
+                "These numbers spell out a programming language!"),
+
+            Level(4,
+                "Fix the Logic!\nWhat operator fixes this code?\n\nif age [] 18:\n    print('Adult')\nelse:\n    print('Minor')",
+                {"code": "if age [] 18:",
+                 "options": [">=", "<=", "==", "!="]},
+                ">=",
+                "Think about checking if someone is an adult!"),
+
+            Level(5,
+                "Complete the Sequence!\nWhat's the missing operator?\n\nresult = 10 [] 2 [] 3\nprint(result)  # Output: 5",
+                {"sequence": "10 [] 2 [] 3",
+                 "target": 5},
+                "/ +",
+                "Division then addition...")
         ]
 
-class InputBox: # Added InputBox class, assuming it's defined elsewhere and needed.  This is a guess based on original code.
+class InputBox:
     def __init__(self, x, y, w, h, text=""):
         self.rect = pygame.Rect(x, y, w, h)
         self.color = Colors.INPUT_BOX
@@ -53,12 +77,12 @@ class InputBox: # Added InputBox class, assuming it's defined elsewhere and need
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
-class HomeScreen: # Added HomeScreen class. This is a guess based on original code.
+class HomeScreen:
     def __init__(self, game):
-        pass # Placeholder, actual implementation needed.
+        pass
 
     def handle_event(self, event):
-        pass # Placeholder
+        pass
 
     def draw(self, screen):
-        pass # Placeholder
+        pass

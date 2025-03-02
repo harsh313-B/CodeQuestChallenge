@@ -113,14 +113,14 @@ class LevelScreen(GameState):
         super().__init__(game)
         self.level_manager = LevelManager()
         self.current_level = self.level_manager.levels[level_num - 1]
-        self.answer_box = InputBox(250, 300, 300, 40, "Answer")
+        self.answer_box = InputBox(250, 350, 300, 40, "Your Answer")
         self.show_hint = False
         self.start_time = pygame.time.get_ticks()
 
         # Initialize buttons
-        self.submit_button = Button("Submit Answer", 300, 360, 200, 50)
-        self.hint_button = Button("Show Hint", 300, 420, 200, 50)
-        self.back_button = Button("Back to Menu", 300, 480, 200, 50)
+        self.submit_button = Button("Submit Answer", 300, 410, 200, 50)
+        self.hint_button = Button("Show Hint", 300, 470, 200, 50)
+        self.back_button = Button("Back to Menu", 300, 530, 200, 50)
 
     def handle_event(self, event):
         self.answer_box.handle_event(event)
@@ -150,7 +150,7 @@ class LevelScreen(GameState):
 
             if self.current_level.number < 5:
                 self.game.change_state(LevelScreen(self.game,
-                                                 self.current_level.number + 1))
+                                                self.current_level.number + 1))
             else:
                 self.game.change_state(HomeScreen(self.game))
 
@@ -158,17 +158,25 @@ class LevelScreen(GameState):
         # Draw level number
         level_text = Fonts.LARGE.render(f"Level {self.current_level.number}",
                                      True, Colors.TEXT)
-        screen.blit(level_text, (320, 100))
+        screen.blit(level_text, (320, 50))
 
-        # Draw question
-        question_text = Fonts.MEDIUM.render(self.current_level.question,
-                                         True, Colors.TEXT)
-        screen.blit(question_text, (100, 200))
+        # Draw puzzle description (handle multiple lines)
+        desc_lines = self.current_level.description.split('\n')
+        y_offset = 120
+        for line in desc_lines:
+            desc_text = Fonts.MEDIUM.render(line, True, Colors.TEXT)
+            screen.blit(desc_text, (50, y_offset))
+            y_offset += 40
 
-        # Draw answer box
+        # Draw puzzle-specific elements
+        if 'pattern' in self.current_level.puzzle_data:
+            pattern = self.current_level.puzzle_data['pattern']
+            for i, line in enumerate(pattern):
+                pattern_text = Fonts.MEDIUM.render(line, True, Colors.TEXT)
+                screen.blit(pattern_text, (350, 200 + i * 30))
+
+        # Draw answer box and buttons
         self.answer_box.draw(screen)
-
-        # Draw buttons
         self.submit_button.draw(screen)
         self.hint_button.draw(screen)
         self.back_button.draw(screen)
@@ -177,4 +185,4 @@ class LevelScreen(GameState):
         if self.show_hint:
             hint_text = Fonts.SMALL.render(f"Hint: {self.current_level.hint}",
                                         True, Colors.TEXT)
-            screen.blit(hint_text, (100, 500))
+            screen.blit(hint_text, (50, 580))
