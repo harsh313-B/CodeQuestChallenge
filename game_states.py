@@ -3,6 +3,7 @@ from ui.button import Button
 from ui.input_box import InputBox
 from assets.styles import Colors, Fonts
 from levels.level_manager import LevelManager
+from datetime import datetime, timedelta
 
 class GameState:
     def __init__(self, game):
@@ -25,6 +26,7 @@ class HomeScreen(GameState):
             Button("Login", 300, 320, 200, 50),
             Button("Register", 300, 390, 200, 50)
         ]
+        self.high_scores = self.game.db.get_high_scores()
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -53,6 +55,29 @@ class HomeScreen(GameState):
             user_text = Fonts.SMALL.render(f"Logged in as: {self.game.current_user}",
                                          True, Colors.TEXT)
             screen.blit(user_text, (10, 10))
+
+            # Draw user's scores
+            scores = self.game.db.get_user_scores(self.game.current_user)
+            if scores:
+                y_pos = 50
+                for level, score, time, date in scores:
+                    score_text = Fonts.SMALL.render(
+                        f"Level {level}: {score} pts ({time:.1f}s)",
+                        True, Colors.TEXT)
+                    screen.blit(score_text, (10, y_pos))
+                    y_pos += 25
+
+        # Draw high scores
+        if self.high_scores:
+            title_text = Fonts.MEDIUM.render("High Scores", True, Colors.TEXT)
+            screen.blit(title_text, (550, 200))
+
+            y_pos = 240
+            for username, total_score, levels, first_completion in self.high_scores:
+                score_text = Fonts.SMALL.render(
+                    f"{username}: {total_score}", True, Colors.TEXT)
+                screen.blit(score_text, (550, y_pos))
+                y_pos += 25
 
 class AuthScreen(GameState):
     def __init__(self, game, is_login=True):
@@ -88,7 +113,8 @@ class AuthScreen(GameState):
             else:
                 self.message = "Invalid credentials"
         else:
-            if self.game.db.register_user(username, password):
+            user_id = self.game.db.register_user(username, password)
+            if user_id:
                 self.game.current_user = username
                 self.game.change_state(HomeScreen(self.game))
             else:
@@ -159,6 +185,11 @@ class LevelScreen(GameState):
         level_text = Fonts.LARGE.render(f"Level {self.current_level.number}",
                                      True, Colors.TEXT)
         screen.blit(level_text, (320, 50))
+
+        # Draw timer
+        elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000
+        timer_text = Fonts.MEDIUM.render(f"Time: {elapsed_time:.1f}s", True, Colors.TEXT)
+        screen.blit(timer_text, (650, 50))
 
         # Draw puzzle description (handle multiple lines)
         desc_lines = self.current_level.description.split('\n')
